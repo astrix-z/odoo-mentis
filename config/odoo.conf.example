@@ -1,0 +1,20 @@
+[options]
+; Copy to .local/odoo.conf and replace this local-only master password.
+admin_passwd = REPLACE_WITH_RANDOM_LOCAL_PASSWORD
+db_host = db
+db_port = 5432
+db_user = odoo
+db_name = mentis_dev
+dbfilter = ^mentis_dev$
+list_db = False
+addons_path = /usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons
+data_dir = /var/lib/odoo
+http_interface = 0.0.0.0
+http_port = 8069
+proxy_mode = False
+workers = 0
+max_cron_threads = 0
+smtp_server = invalid
+smtp_port = 1025
+limit_time_cpu = 600
+limit_time_real = 1200
