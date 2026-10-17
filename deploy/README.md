@@ -1,6 +1,10 @@
 # Git branches and production deployment
 
-The shared bare repository is `jb@192.168.55.70:/home/jb/repos/odoo-mentis.git`.
+The shared private repository is https://github.com/astrix-z/odoo-mentis.
+Local `origin` uses HTTPS with GitHub CLI authentication. The production checkout
+uses SSH and a dedicated read-only deploy key stored only on the server.
+The previous bare repository remains at `/home/jb/repos/odoo-mentis.git`; its local
+remote is named `server`, and its server-checkout remote is named `server-backup`.
 The local checkout normally uses `developement` (spelling intentional). `stage` is
 an integration branch; `production` contains reviewed production releases. These
 are Git branches, not three running environments; no staging Odoo service is created.
@@ -45,8 +49,8 @@ git push origin production
 git switch developement
 ```
 
-The server rejects non-fast-forward pushes and branch deletion. Pushing does not
-restart Odoo or deploy automatically. From the server's administrative console:
+Use fast-forward promotion and avoid force pushes or deleting release branches.
+GitHub branch protection is not configured. Pushing does not restart Odoo or deploy automatically. From the server's administrative console:
 
 ```sh
 bash /srv/odoo-mentis/deploy/update-production.sh
@@ -61,3 +65,8 @@ through a reviewed revert on `production`, push, and deploy again.
 
 Configure your own Git author name/email in each development checkout. The initial
 local baseline uses repository-local author `jb <jb@localhost>`.
+
+The server repository config selects `/home/jb/.ssh/odoo-mentis-github_ed25519`
+via `core.sshCommand`; the private key is not copied locally or committed. GitHub
+host keys are pinned in `/home/jb/.ssh/odoo-mentis-github_known_hosts` using the
+GitHub HTTPS metadata API. This deploy key permits fetches, not pushes.

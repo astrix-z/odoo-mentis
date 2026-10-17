@@ -103,7 +103,8 @@ TOTP. Адрес `localadmin@example.invalid` предназначен толь�
 
 Ветки: `developement` — локальная разработка, `stage` — интеграция, `production` —
 боевые релизы. Общий remote `origin`:
-`jb@192.168.55.70:/home/jb/repos/odoo-mentis.git`.
+`https://github.com/astrix-z/odoo-mentis.git` (приватный репозиторий).
+Прежний серверный remote сохранён локально как `server`.
 
 Рабочая копия сервера готовится на `production`; подключение её к systemd требует
 однократного запуска скрипта от root. Порядок переключения сервиса, продвижения
