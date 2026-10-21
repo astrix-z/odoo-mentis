@@ -36,6 +36,23 @@ Inspect the active configuration with `systemctl cat odoo` and `systemctl show o
 
 ## Branch workflow
 
+All production updates are performed by the agent, including delivering changed
+deployment scripts, promoting the release, running deployment, and verifying the
+result. Do not ask the user to execute routine update commands manually. The agent
+connects as `jb`:
+
+```sh
+ssh jb@192.168.55.70 'bash /srv/odoo-mentis/deploy/update-production.sh'
+```
+
+Before deployment, inspect the server checkout and reconcile any server-only
+commits through the shared repository. After deployment, verify the actual server
+HEAD with `git -C /srv/odoo-mentis rev-parse HEAD`, service status, and HTTP health;
+report the deployed commit and outcome. The script's printed target commit alone
+does not establish the actual HEAD when the server has local commits. If SSH or
+permissions prevent completion, report the concrete blocker. Root is reserved for
+initial setup and operations that specifically require elevated privileges.
+
 Develop and verify changes locally, commit on `developement`, then promote:
 
 ```sh
@@ -50,13 +67,13 @@ git switch developement
 ```
 
 Use fast-forward promotion and avoid force pushes or deleting release branches.
-GitHub branch protection is not configured. Pushing does not restart Odoo or deploy automatically. From the server's administrative console:
+GitHub branch protection is not configured. Pushing does not restart Odoo or deploy automatically. From the server SSH session as `jb` (after the one-time permission setup below):
 
 ```sh
 bash /srv/odoo-mentis/deploy/update-production.sh
 ```
 
-This requires a clean `production` checkout, fetches the shared repository, applies
+The script must run as `jb`, not root. This requires a clean `production` checkout, fetches the shared repository, applies
 a fast-forward update, restarts Odoo and checks `/web/login`. Review module/schema
 changes separately and take a fresh database/filestore backup before any required
 module upgrade. A failed update health check reports the previous commit; it does
@@ -70,3 +87,41 @@ The server repository config selects `/home/jb/.ssh/odoo-mentis-github_ed25519`
 via `core.sshCommand`; the private key is not copied locally or committed. GitHub
 host keys are pinned in `/home/jb/.ssh/odoo-mentis-github_known_hosts` using the
 GitHub HTTPS metadata API. This deploy key permits fetches, not pushes.
+
+## Allow deployment as jb (one-time root setup)
+
+After these deployment files have been delivered to the server, run as root:
+
+```sh
+# Only if polkit is not installed:
+apt-get update
+apt-get install -y polkitd
+bash /srv/odoo-mentis/deploy/enable-jb-deploy.sh
+```
+
+This installs a root-owned polkit rule permitting only user `jb` to restart
+`odoo.service`. Polkit reloads rules automatically; setup does not restart Odoo.
+No sudo installation or authentication agent is needed, including over SSH.
+The initial cutover script still requires root.
+
+For each subsequent deployment, the agent connects as `jb` and runs:
+
+```sh
+bash /srv/odoo-mentis/deploy/update-production.sh
+```
+
+Remove `/etc/polkit-1/rules.d/50-odoo-mentis-deploy.rules` as root to revoke
+this permission. Ensure any server-only commits have been incorporated into
+`origin/production` before deploying; the update must remain a fast-forward.
+
+## Deployment script checks
+
+Run from the repository root with Python 3 and Bash (no database, systemd or
+network required; external commands are mocked):
+
+```sh
+python3 -m unittest discover -s tests -p 'test_*.py'
+bash -n deploy/update-production.sh deploy/enable-jb-deploy.sh
+```
+
+These checks do not exercise real server polkit authorization or restart Odoo.
