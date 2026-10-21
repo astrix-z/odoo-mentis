@@ -18,6 +18,10 @@ class MentisOutlet(models.Model):
         string='Responsible Service Staff', domain=[('share', '=', False)],
         help='Service staff who handle this outlet on regular days. '
              'New service tasks of the outlet are assigned to them outside duty shifts.')
+    accounting_user_ids = fields.Many2many(
+        'res.users', 'mentis_outlet_accounting_user_rel', 'outlet_id', 'user_id',
+        string='Accountants', domain=[('share', '=', False)],
+        help='Accountants who see the accounting tasks of this outlet.')
 
     _sql_constraints = [
         ('code_unique', 'unique(code)', 'Outlet code must be unique.'),

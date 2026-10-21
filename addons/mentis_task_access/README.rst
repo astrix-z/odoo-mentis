@@ -10,7 +10,7 @@ Setup
 =====
 
 1. *Project → Configuration → Networks / Outlets*: create networks with their managers,
-   then outlets with their outlet managers and responsible service staff.
+   then outlets with their outlet managers, responsible service staff and accountants.
 2. Create one project per department and set *Department Queue* (IT, Service, Accounting).
    Queue projects must stay "Invited internal users"; new projects default to it.
    Enable *Sub-tasks* in the IT project for outlet sub-tasks.
@@ -29,7 +29,7 @@ Network Manager    tasks of outlets in networks they manage, and tasks scoped to
 Outlet Manager     tasks of outlets they manage, in any queue
 IT                 all tasks of IT queue projects
 Service            Service queue tasks of outlets they are responsible for
-Accounting         all tasks of Accounting queue projects
+Accounting         Accounting queue tasks of outlets they are accountants for
 =================  ==========================================================================
 
 Odoo's own rules still apply for everyone: assignees and followers see the task, and

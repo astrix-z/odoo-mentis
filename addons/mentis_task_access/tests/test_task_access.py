@@ -23,6 +23,7 @@ class TestTaskAccess(TransactionCase):
         cls.service_bufet1 = user('service_bufet1', 'group_service')
         cls.service_goodtime1 = user('service_goodtime1', 'group_service')
         cls.accountant = user('accountant', 'group_accounting')
+        cls.accountant_goodtime1 = user('accountant_goodtime1', 'group_accounting')
         cls.employee = new_test_user(cls.env, login='employee', groups='base.group_user,project.group_project_user')
 
         Network = cls.env['mentis.network']
@@ -33,11 +34,13 @@ class TestTaskAccess(TransactionCase):
             'name': 'Bufet 1', 'code': 'bufet-01', 'network_id': bufet.id,
             'manager_ids': [(6, 0, cls.bufet1_manager.ids)],
             'service_user_ids': [(6, 0, cls.service_bufet1.ids)],
+            'accounting_user_ids': [(6, 0, cls.accountant.ids)],
         })
         cls.bufet2 = Outlet.create({'name': 'Bufet 2', 'code': 'bufet-02', 'network_id': bufet.id})
         cls.goodtime1 = Outlet.create({
             'name': 'Goodtime 1', 'code': 'goodtime-01', 'network_id': goodtime.id,
             'service_user_ids': [(6, 0, cls.service_goodtime1.ids)],
+            'accounting_user_ids': [(6, 0, cls.accountant_goodtime1.ids)],
         })
 
         Project = cls.env['project.project']
@@ -56,20 +59,24 @@ class TestTaskAccess(TransactionCase):
         cls.service_g1 = task('Service goodtime-01', cls.service, cls.goodtime1)
         cls.it_b1 = task('IT bufet-01', cls.it, cls.bufet1)
         cls.it_g1 = task('IT goodtime-01', cls.it, cls.goodtime1)
+        cls.accounting_b1 = task('Close the month bufet-01', cls.accounting, cls.bufet1)
+        cls.accounting_g1 = task('Close the month goodtime-01', cls.accounting, cls.goodtime1)
         cls.accounting_task = task('Close the month', cls.accounting)
-        cls.all_tasks = cls.service_b1 | cls.service_b2 | cls.service_g1 | cls.it_b1 | cls.it_g1 | cls.accounting_task
+        cls.all_tasks = cls.service_b1 | cls.service_b2 | cls.service_g1 | cls.it_b1 | cls.it_g1 \
+            | cls.accounting_b1 | cls.accounting_g1 | cls.accounting_task
 
     def visible(self, user):
         return self.env['project.task'].with_user(user).search([('id', 'in', self.all_tasks.ids)])
 
     def test_visibility_by_role(self):
         self.assertEqual(self.visible(self.executive), self.all_tasks)
-        self.assertEqual(self.visible(self.bufet_manager), self.service_b1 | self.service_b2 | self.it_b1)
-        self.assertEqual(self.visible(self.bufet1_manager), self.service_b1 | self.it_b1)
+        self.assertEqual(self.visible(self.bufet_manager), self.service_b1 | self.service_b2 | self.it_b1 | self.accounting_b1)
+        self.assertEqual(self.visible(self.bufet1_manager), self.service_b1 | self.it_b1 | self.accounting_b1)
         self.assertEqual(self.visible(self.it_user), self.it_b1 | self.it_g1)
         self.assertEqual(self.visible(self.service_bufet1), self.service_b1)
         self.assertEqual(self.visible(self.service_goodtime1), self.service_g1)
-        self.assertEqual(self.visible(self.accountant), self.accounting_task)
+        self.assertEqual(self.visible(self.accountant), self.accounting_b1)
+        self.assertEqual(self.visible(self.accountant_goodtime1), self.accounting_g1)
         self.assertFalse(self.visible(self.employee))
 
     def test_reassigning_outlet_moves_visibility(self):
@@ -77,6 +84,12 @@ class TestTaskAccess(TransactionCase):
         self.assertFalse(self.visible(self.bufet1_manager))
         self.bufet2.manager_ids = [(6, 0, self.bufet1_manager.ids)]
         self.assertEqual(self.visible(self.bufet1_manager), self.service_b2)
+
+    def test_reassigning_accountant_moves_visibility(self):
+        self.goodtime1.accounting_user_ids = [(4, self.accountant.id)]
+        self.assertEqual(self.visible(self.accountant), self.accounting_b1 | self.accounting_g1)
+        self.bufet1.accounting_user_ids = [(5,)]
+        self.assertEqual(self.visible(self.accountant), self.accounting_g1)
 
     def test_access_error_outside_scope(self):
         with self.assertRaises(AccessError):
@@ -140,7 +153,9 @@ class TestTaskAccess(TransactionCase):
     def test_task_analysis_follows_task_visibility(self):
         Report = self.env['report.project.task.user'].with_user(self.bufet1_manager)
         rows = Report.search([('task_id', 'in', self.all_tasks.ids)])
-        self.assertEqual(rows.task_id, self.service_b1 | self.it_b1)
+        self.assertEqual(rows.task_id, self.service_b1 | self.it_b1 | self.accounting_b1)
+        rows = self.env['report.project.task.user'].with_user(self.accountant).search([('task_id', 'in', self.all_tasks.ids)])
+        self.assertEqual(rows.task_id, self.accounting_b1)
 
     def scoped_it_task(self, **vals):
         return self.env['project.task'].with_user(self.it_user).with_context(default_project_id=self.it.id).create({

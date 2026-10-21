@@ -1,6 +1,6 @@
 {
     'name': 'Mentis Task Access',
-    'version': '16.0.1.0.0',
+    'version': '16.0.1.1.0',
     'category': 'Services/Project',
     'summary': 'Task visibility by network, outlet and department; service duty auto-assignment',
     'depends': ['project'],
