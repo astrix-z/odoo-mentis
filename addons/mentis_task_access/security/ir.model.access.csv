@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_mentis_network_user,mentis.network.user,model_mentis_network,base.group_user,1,0,0,0
+access_mentis_network_manager,mentis.network.manager,model_mentis_network,project.group_project_manager,1,1,1,1
+access_mentis_outlet_user,mentis.outlet.user,model_mentis_outlet,base.group_user,1,0,0,0
+access_mentis_outlet_manager,mentis.outlet.manager,model_mentis_outlet,project.group_project_manager,1,1,1,1
+access_mentis_service_duty_user,mentis.service.duty.user,model_mentis_service_duty,base.group_user,1,0,0,0
+access_mentis_service_duty_manager,mentis.service.duty.manager,model_mentis_service_duty,project.group_project_manager,1,1,1,1

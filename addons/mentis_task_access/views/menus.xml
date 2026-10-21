@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_mentis_service_duty" name="Service Duty" parent="project.menu_main_pm"
+              action="mentis_service_duty_action" sequence="30"/>
+    <menuitem id="menu_mentis_network" name="Networks" parent="project.menu_project_config"
+              action="mentis_network_action" sequence="40"/>
+    <menuitem id="menu_mentis_outlet" name="Outlets" parent="project.menu_project_config"
+              action="mentis_outlet_action" sequence="41"/>
+
+</odoo>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="mentis_network_view_tree" model="ir.ui.view">
+        <field name="name">mentis.network.tree</field>
+        <field name="model">mentis.network</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="manager_ids" widget="many2many_avatar_user"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="mentis_network_view_form" model="ir.ui.view">
+        <field name="name">mentis.network.form</field>
+        <field name="model">mentis.network</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="manager_ids" widget="many2many_avatar_user"/>
+                        </group>
+                    </group>
+                    <field name="outlet_ids">
+                        <tree>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="manager_ids" widget="many2many_avatar_user"/>
+                            <field name="service_user_ids" widget="many2many_avatar_user"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="mentis_network_action" model="ir.actions.act_window">
+        <field name="name">Networks</field>
+        <field name="res_model">mentis.network</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

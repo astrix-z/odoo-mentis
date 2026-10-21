@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="mentis_service_duty_view_tree" model="ir.ui.view">
+        <field name="name">mentis.service.duty.tree</field>
+        <field name="model">mentis.service.duty</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="mentis_service_duty_view_calendar" model="ir.ui.view">
+        <field name="name">mentis.service.duty.calendar</field>
+        <field name="model">mentis.service.duty</field>
+        <field name="arch" type="xml">
+            <calendar date_start="date_start" date_stop="date_end" color="user_id" mode="month">
+                <field name="user_id" avatar_field="avatar_128"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="mentis_service_duty_view_search" model="ir.ui.view">
+        <field name="name">mentis.service.duty.search</field>
+        <field name="model">mentis.service.duty</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="user_id"/>
+                <filter string="Current and Upcoming" name="upcoming"
+                        domain="[('date_end', '>=', context_today().strftime('%Y-%m-%d'))]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="mentis_service_duty_action" model="ir.actions.act_window">
+        <field name="name">Service Duty</field>
+        <field name="res_model">mentis.service.duty</field>
+        <field name="view_mode">calendar,tree</field>
+        <field name="context">{'search_default_upcoming': 1}</field>
+    </record>
+
+</odoo>

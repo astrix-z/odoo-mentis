@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_task_form2_inherit_mentis" model="ir.ui.view">
+        <field name="name">project.task.form.mentis</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <header position="inside">
+                <button name="action_mentis_create_outlet_subtasks" string="Create Outlet Sub-tasks" type="object"
+                        groups="mentis_task_access.group_it,mentis_task_access.group_executive,project.group_project_manager"
+                        attrs="{'invisible': [('mentis_scope_network_ids', '=', []), ('mentis_scope_outlet_ids', '=', [])]}"/>
+            </header>
+            <field name="milestone_id" position="before">
+                <field name="project_mentis_queue" invisible="1"/>
+                <field name="mentis_outlet_id" options="{'no_create': True}"
+                       attrs="{'required': [('project_mentis_queue', '=', 'service')],
+                               'invisible': ['|', ('mentis_scope_network_ids', '!=', []), ('mentis_scope_outlet_ids', '!=', [])]}"/>
+                <field name="mentis_network_id" attrs="{'invisible': [('mentis_outlet_id', '=', False)]}"/>
+                <field name="mentis_scope_network_ids" widget="many2many_tags" options="{'no_create': True}"
+                       attrs="{'invisible': ['|', ('mentis_outlet_id', '!=', False), ('parent_id', '!=', False)]}"/>
+                <field name="mentis_scope_outlet_ids" widget="many2many_tags" options="{'no_create': True}"
+                       attrs="{'invisible': ['|', ('mentis_outlet_id', '!=', False), ('parent_id', '!=', False)]}"/>
+            </field>
+            <xpath expr="//field[@name='child_ids']/tree/field[@name='name']" position="after">
+                <field name="mentis_outlet_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="quick_create_task_form_inherit_mentis" model="ir.ui.view">
+        <field name="name">project.task.form.quick_create.mentis</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.quick_create_task_form"/>
+        <field name="arch" type="xml">
+            <field name="user_ids" position="before">
+                <field name="mentis_outlet_id" options="{'no_create': True}"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_task_tree2_inherit_mentis" model="ir.ui.view">
+        <field name="name">project.task.tree.mentis</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_tree2"/>
+        <field name="arch" type="xml">
+            <field name="project_id" position="after">
+                <field name="mentis_outlet_id" optional="show"/>
+                <field name="mentis_network_id" optional="hide"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_task_search_form_inherit_mentis" model="ir.ui.view">
+        <field name="name">project.task.search.mentis</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_search_form"/>
+        <field name="arch" type="xml">
+            <field name="user_ids" position="after">
+                <field name="mentis_outlet_id"/>
+                <field name="mentis_network_id"/>
+            </field>
+            <filter name="user" position="after">
+                <filter string="Outlet" name="groupby_mentis_outlet" context="{'group_by': 'mentis_outlet_id'}"/>
+                <filter string="Network" name="groupby_mentis_network" context="{'group_by': 'mentis_network_id'}"/>
+            </filter>
+        </field>
+    </record>
+
+</odoo>

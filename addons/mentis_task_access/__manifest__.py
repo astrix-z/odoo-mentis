@@ -1,0 +1,20 @@
+{
+    'name': 'Mentis Task Access',
+    'version': '16.0.1.0.0',
+    'category': 'Services/Project',
+    'summary': 'Task visibility by network, outlet and department; service duty auto-assignment',
+    'depends': ['project'],
+    'data': [
+        'security/mentis_task_access_security.xml',
+        'security/ir.model.access.csv',
+        'views/mentis_network_views.xml',
+        'views/mentis_outlet_views.xml',
+        'views/mentis_service_duty_views.xml',
+        'views/project_project_views.xml',
+        'views/project_task_views.xml',
+        'views/menus.xml',
+    ],
+    'license': 'LGPL-3',
+    'installable': True,
+    'application': False,
+}
