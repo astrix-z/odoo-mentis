@@ -1,6 +1,9 @@
 # Local replica data and secrets (production snapshots, credentials)
 .local/
 
+# Per-user Claude Code settings
+.claude/settings.local.json
+
 # Environments
 .env
 .envrc
